@@ -8,11 +8,17 @@ import {PasswordHasherBindings} from "../utils/namespaces";
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {UserRepository} from "../repositories";
 import {Credentials} from "../utils/interfaces";
+import moment = require("moment");
+import {EmailService} from "../services/email.service";
+
+const PSW_REC_INTERVAL_HOURS = 24;
+const PSW_REC_TOKEN_INTERVAL_HOURS = 168;
 
 export class UserController {
     constructor(
         @repository(UserRepository)
         public userRepository: UserRepository,
+        @inject('services.EmailService') private emailService: EmailService,
         @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher
     ) {
     }
@@ -58,7 +64,6 @@ export class UserController {
             },
         },
     })
-    @secured(SecuredType.PERMIT_ALL)
     async login(@param.header.string('apiKey') apiKey = '',
                 @requestBody({
                     required: true,
@@ -74,9 +79,7 @@ export class UserController {
                         },
                     },
                 })
-
                     credentials: Credentials) {
-
         this.userRepository.handleApiKeyAuth(apiKey);
 
         if (!this.userRepository.validateEmail(credentials.email))
@@ -88,6 +91,69 @@ export class UserController {
         const user: User | null = await this.userRepository.findOne({where: {email: credentials.email}});
 
         return this.userRepository.handleLogin(user, credentials);
+    }
+
+    @post('/users/password-recovery', {
+        operationId: 'Password recovery',
+        description: 'Recover user password: the procedure will be sent by email',
+        responses: {
+            responses: {
+                '200': {
+                    description: 'Mail sent successfully',
+                },
+            },
+        },
+    })
+    async passwordRecovery(
+        @param.header.string('apiKey') apiKey = '',
+        @requestBody({
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            email: {type: 'string'}
+                        },
+                    },
+                },
+            },
+        })
+            data: {
+            email: string
+        },
+    ): Promise<undefined> {
+        this.userRepository.handleApiKeyAuth(apiKey);
+
+        if (typeof data.email === "undefined" || !data.email) throw new HttpErrors.BadRequest('E-mail is missing');
+
+        if (!this.userRepository.validateEmail(data.email))
+            throw new HttpErrors.BadRequest('E-mail address isn\'t valid');
+
+        const user: User | null = await this.userRepository.findOne({where: {email: data.email}});
+
+        if (!user) throw new HttpErrors.BadRequest('This user doesn\'t exists');
+
+        if (user.pswRecExpireDate && moment(user.pswRecExpireDate).isSameOrAfter(moment()))
+            throw new HttpErrors.BadRequest('You have already requested the password, check your email');
+
+        const pswRecToken = await this.userRepository.generateToken(user);
+        const pswRecExpireDate = moment(moment.utc(moment().add(PSW_REC_INTERVAL_HOURS, 'hours'))).local().toDate();
+        const pswRecTokenExpireDate = moment(moment.utc(moment().add(PSW_REC_TOKEN_INTERVAL_HOURS, 'hours'))).local().toDate();
+
+        await this.userRepository.updateById(user.id, {
+            pswRecExpireDate,
+            pswRecToken,
+            pswRecTokenExpireDate
+        });
+
+        user.pswRecExpireDate = pswRecExpireDate;
+        user.pswRecToken = pswRecToken;
+        user.pswRecTokenExpireDate = pswRecTokenExpireDate;
+
+        await this.emailService.sendPassword(user);
+
+        return new Promise(resolve => resolve());
     }
 
     /*@get('/users/count', {

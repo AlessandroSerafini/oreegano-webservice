@@ -5,7 +5,7 @@ export class Role extends Entity {
   @property({
     type: 'number',
     id: true,
-    generated: true,
+    generated: false,
   })
   id: number;
 
@@ -13,11 +13,6 @@ export class Role extends Entity {
     type: 'string',
   })
   description?: string;
-
-  @property({
-    type: 'number',
-  })
-  userId?: number;
 
   constructor(
     data?: Partial<Role>,

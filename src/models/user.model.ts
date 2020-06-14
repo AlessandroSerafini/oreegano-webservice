@@ -39,6 +39,24 @@ export class User extends Entity {
     })
     password: string;
 
+    @property({
+        type: 'string',
+        required: false
+    })
+    pswRecToken?: string;
+
+    @property({
+        type: 'date',
+        required: false
+    })
+    pswRecTokenExpireDate?: Date;
+
+    @property({
+        type: 'date',
+        required: false
+    })
+    pswRecExpireDate?: Date;
+
 
     constructor(data?: Partial<User>) {
         super(data);
