@@ -156,6 +156,52 @@ export class UserController {
         return new Promise(resolve => resolve());
     }
 
+    @post('/users/password-reset/{token}', {
+        responses: {
+            '200': {
+                description: 'Password RESET success',
+            },
+        },
+    })
+    @secured(SecuredType.PERMIT_ALL)
+    async resetPasswordByToken(
+      @param.header.string('apiKey') apiKey = '',
+      @param.path.string('token') token: string,
+      @requestBody({
+          required: true,
+          content: {
+              'application/json': {
+                  schema: {
+                      type: 'object',
+                      properties: {
+                          password: {type: 'string'}
+                      },
+                  },
+              },
+          },
+      })
+        data: any,
+    ): Promise<any> {
+        this.userRepository.handleApiKeyAuth(apiKey);
+        const user: User | null = await this.userRepository.findOne({where: {pswRecToken: token}});
+
+        if (!user)
+            throw new HttpErrors.BadRequest('Token not valid');
+
+        if (!data.password)
+            throw new HttpErrors.BadRequest('Missing new password');
+
+        if (user.pswRecTokenExpireDate && moment(moment()).isSameOrAfter(user.pswRecTokenExpireDate))
+            throw new HttpErrors.BadRequest('This token is expired. You have to require password reset again.');
+
+        return this.userRepository.updateById(user.id, {
+            password: await this.passwordHasher.hashPassword(data.password),
+            pswRecToken: undefined,
+            pswRecTokenExpireDate: undefined,
+            pswRecExpireDate: undefined
+        })
+    }
+
     /*@get('/users/count', {
         responses: {
             '200': {

@@ -29,7 +29,6 @@ export class EmailService {
 
     transporter.sendMail(mailOptions, (error: any, info: any) => {
       if (error) {
-        console.log('passo1');
         return console.log(error);
       }
       console.log('Message %s sent: %s', info.messageId, info.response);
@@ -42,10 +41,10 @@ export class EmailService {
     let template: string = await this.readdirAsync('./src/mails-templates/password-recovery.html');
 
     const mapObj:any = {
-      "{{email}}": user.email,
+      "{{name}}": user.name,
       "{{url}}": url
     };
-    template = template.replace(/{{email}}|{{url}}/gi, (matched) => {
+    template = template.replace(/{{name}}|{{url}}/gi, (matched) => {
       return mapObj[matched];
     });
 
