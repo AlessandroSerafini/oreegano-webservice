@@ -9,13 +9,14 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
-import {MyAuthBindings, PasswordHasherBindings} from "./utils/namespaces";
+import { EmailServiceBindings, MyAuthBindings, PasswordHasherBindings } from "./utils/namespaces";
 import {MyAuthAuthenticationStrategyProvider} from "./providers/MyAuthAuthenticationStrategyProvider";
 import {MyAuthMetadataProvider} from "./providers/MyAuthMetadataProvider";
 import {MyAuthActionProvider} from "./providers/MyAuthActionProvider";
 import {BcryptHasher} from "./services/hash.password.bcryptjs";
 import {AuthenticationBindings} from "@loopback/authentication";
 import {SECURITY_SCHEME_SPEC} from "./utils/enums";
+import { EmailService } from "./services/email.service";
 
 export interface PackageInfo {
     name: string;
@@ -58,6 +59,8 @@ export class TesiAlessandroSerafiniWsApplication extends BootMixin(
         // // Bind bcrypt hash services
         this.bind(PasswordHasherBindings.ROUNDS).to(10);
         this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
+
+        this.bind(EmailServiceBindings.EMAIL_SERVICE).toClass(EmailService);
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here

@@ -29,6 +29,7 @@ export class EmailService {
 
     transporter.sendMail(mailOptions, (error: any, info: any) => {
       if (error) {
+        console.log('passo1');
         return console.log(error);
       }
       console.log('Message %s sent: %s', info.messageId, info.response);
