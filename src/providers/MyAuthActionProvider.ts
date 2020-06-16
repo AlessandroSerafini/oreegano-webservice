@@ -1,10 +1,10 @@
-import {Getter, inject, Provider, Setter,} from '@loopback/core';
-import {AuthenticateFn, AuthenticationBindings, AuthenticationStrategy,} from '@loopback/authentication';
-import {UserProfile} from '@loopback/security';
-import {Request} from '@loopback/rest';
-import {SecuredType} from "../utils/enums";
-import {MyAuthenticationMetadata} from "../utils/interfaces";
-import {MyAuthBindings} from "../utils/namespaces";
+import { Getter, inject, Provider, Setter, } from '@loopback/core';
+import { AuthenticateFn, AuthenticationBindings, AuthenticationStrategy, } from '@loopback/authentication';
+import { UserProfile } from '@loopback/security';
+import { Request } from '@loopback/rest';
+import { SecuredType } from "../utils/enums";
+import { MyAuthenticationMetadata } from "../utils/interfaces";
+import { MyAuthBindings } from "../utils/namespaces";
 
 export class MyAuthActionProvider implements Provider<AuthenticateFn> {
   constructor(

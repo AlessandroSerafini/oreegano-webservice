@@ -1,10 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
-import {UserRoles} from "../utils/enums";
-
-export enum USER_TYPE {
-    CUSTOMER = "CUSTOMER",
-    STORE = "STORE",
-}
+import { Entity, model, property } from '@loopback/repository';
+import { UserRoles } from "../utils/enums";
 
 @model()
 export class User extends Entity {

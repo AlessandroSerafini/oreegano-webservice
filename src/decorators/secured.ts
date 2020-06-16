@@ -1,7 +1,7 @@
-import {MethodDecoratorFactory,} from '@loopback/core';
-import {AUTHENTICATION_METADATA_KEY,} from '@loopback/authentication';
-import {SecuredType} from "../utils/enums";
-import {MyAuthenticationMetadata} from "../utils/interfaces";
+import { MethodDecoratorFactory, } from '@loopback/core';
+import { AUTHENTICATION_METADATA_KEY, } from '@loopback/authentication';
+import { SecuredType } from "../utils/enums";
+import { MyAuthenticationMetadata } from "../utils/interfaces";
 
 // the decorator function, every required param has its own default
 // so we can supply empty param when calling this decorartor.

@@ -1,15 +1,13 @@
-import {Count, CountSchema, Filter, repository, Where,} from '@loopback/repository';
-import {del, get, getModelSchemaRef, HttpErrors, param, patch, post, requestBody,} from '@loopback/rest';
-import {User} from "../models/user.model";
-import {OPERATION_SECURITY_SPEC, SecuredType, UserRoles} from "../utils/enums";
-import {secured} from "../decorators/secured";
-import {inject} from "@loopback/context";
-import {PasswordHasherBindings} from "../utils/namespaces";
-import {PasswordHasher} from "../services/hash.password.bcryptjs";
-import {UserRepository} from "../repositories";
-import {Credentials} from "../utils/interfaces";
+import { repository, } from '@loopback/repository';
+import { getModelSchemaRef, HttpErrors, param, post, requestBody, } from '@loopback/rest';
+import { User } from "../models/user.model";
+import { inject } from "@loopback/context";
+import { PasswordHasherBindings } from "../utils/namespaces";
+import { PasswordHasher } from "../services/hash.password.bcryptjs";
+import { UserRepository } from "../repositories";
+import { Credentials } from "../utils/interfaces";
+import { EmailService } from "../services/email.service";
 import moment = require("moment");
-import {EmailService} from "../services/email.service";
 
 const PSW_REC_INTERVAL_HOURS = 24;
 const PSW_REC_TOKEN_INTERVAL_HOURS = 168;
@@ -52,7 +50,6 @@ export class UserController {
         const mappedUser: User = await this.userRepository.validateUser(user);
         console.log(mappedUser);
         const newUser: User = await this.userRepository.create(mappedUser);
-        await this.userRepository.updateUserPermissions(newUser, newUser.type);
 
         return new Promise(resolve => resolve(this.userRepository.getJwtToken(newUser)));
     }
@@ -163,7 +160,6 @@ export class UserController {
             },
         },
     })
-    @secured(SecuredType.PERMIT_ALL)
     async resetPasswordByToken(
       @param.header.string('apiKey') apiKey = '',
       @param.path.string('token') token: string,

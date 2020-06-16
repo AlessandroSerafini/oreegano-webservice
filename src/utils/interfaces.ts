@@ -1,5 +1,5 @@
-import {AuthenticationMetadata,} from '@loopback/authentication';
-import {SecuredType} from "./enums";
+import { AuthenticationMetadata, } from '@loopback/authentication';
+import { SecuredType } from "./enums";
 
 // extended interface of the default AuthenticationMetadata which only has `strategy` and `options`
 export interface MyAuthenticationMetadata extends AuthenticationMetadata {

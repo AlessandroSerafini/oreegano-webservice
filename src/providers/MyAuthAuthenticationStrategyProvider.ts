@@ -1,27 +1,27 @@
-import {inject, Provider, ValueOrPromise,} from '@loopback/core';
-import {AuthenticationBindings, AuthenticationStrategy,} from '@loopback/authentication';
-import {securityId, UserProfile} from '@loopback/security';
-import {StrategyAdapter} from '@loopback/authentication-passport';
-import {repository} from '@loopback/repository';
+import { inject, Provider, ValueOrPromise, } from '@loopback/core';
+import { AuthenticationBindings, AuthenticationStrategy, } from '@loopback/authentication';
+import { securityId, UserProfile } from '@loopback/security';
+import { StrategyAdapter } from '@loopback/authentication-passport';
+import { repository } from '@loopback/repository';
 import {ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
-import {HttpErrors} from '@loopback/rest';
-import {environment} from "../env/environment";
-import {JWT_STRATEGY_NAME, SecuredType} from "../utils/enums";
-import {JwtStructure, MyAuthenticationMetadata} from "../utils/interfaces";
-import {UserRole} from "../models/user-role.model";
-import {User} from "../models/user.model";
-import {UserRepository, UserRoleRepository} from "../repositories";
+import { HttpErrors } from '@loopback/rest';
+import { environment } from "../env/environment";
+import { JWT_STRATEGY_NAME, SecuredType, UserRoles } from "../utils/enums";
+import { JwtStructure, MyAuthenticationMetadata } from "../utils/interfaces";
+import { User } from "../models/user.model";
+import { UserRepository, UserStoreRepository } from "../repositories";
 
 export class MyAuthAuthenticationStrategyProvider implements Provider<AuthenticationStrategy | undefined> {
     constructor(
         @inject(AuthenticationBindings.METADATA) private metadata: MyAuthenticationMetadata,
         @repository(UserRepository) private userRepository: UserRepository,
-        @repository(UserRoleRepository) private userRoleRepository: UserRoleRepository,
+        @repository(UserStoreRepository) private userStoreRepository: UserStoreRepository,
     ) {
     }
 
     value(): ValueOrPromise<AuthenticationStrategy | undefined> {
         if (!this.metadata) return;
+
         const {strategy} = this.metadata;
 
         if (strategy === JWT_STRATEGY_NAME) {
@@ -33,7 +33,9 @@ export class MyAuthAuthenticationStrategyProvider implements Provider<Authentica
                         ExtractJwt.fromUrlQueryParameter('access_token'),
                     ]),
                 },
-                (payload:any, done:any) => this.verifyToken(payload, done),
+                (payload:any, done:any) => {
+                    return this.verifyToken(payload, done)
+                },
             );
 
             // we will use Loopback's  StrategyAdapter so we can leverage passport's strategy
@@ -81,26 +83,12 @@ export class MyAuthAuthenticationStrategyProvider implements Provider<Authentica
 
         if ([SecuredType.IS_AUTHENTICATED, SecuredType.PERMIT_ALL].includes(type)) return;
 
-        if (type === SecuredType.HAS_ANY_ROLE) {
-            if (!roles.length) return;
-            const {count} = await this.userRoleRepository.count({
-                idUser: idUser,
-                idRole: {inq: roles},
-            });
+        if (type === SecuredType.HAS_ROLES && roles.length) {
 
-            if (count) return;
-        } else if (type === SecuredType.HAS_ROLES && roles.length) {
-            const userRoles = await this.userRoleRepository.find({where: {idUser: idUser}});
+            const count = await this.userStoreRepository.find({where: {idUser: idUser}});
+            const userRole = count.length > 0 ? UserRoles.STORE :UserRoles.CUSTOMER;
 
-            const roleIds = userRoles.map((ur: UserRole) => ur.idRole);
-
-            let valid = true;
-            for (const role of roles) {
-                if (!roleIds.includes(role)) {
-                    valid = false;
-                    break;
-                }
-            }
+            const valid = userRole === roles[0];
             if (valid) return;
         }
         throw new HttpErrors.Unauthorized('Invalid authorization');

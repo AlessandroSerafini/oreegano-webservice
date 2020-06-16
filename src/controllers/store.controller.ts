@@ -1,31 +1,22 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
-import {Store} from "../models/store.model";
-import {StoreRepository} from "../repositories";
+import { repository, } from '@loopback/repository';
+import { getModelSchemaRef, post, requestBody, RestBindings, Request, HttpErrors, } from '@loopback/rest';
+import { Store } from "../models/store.model";
+import { StoreRepository, UserStoreRepository } from "../repositories";
+import { secured } from "../decorators/secured";
+import { SecuredType, UserRoles } from "../utils/enums";
+import { inject } from "@loopback/context";
+import { environment } from "../env/environment";
+const jwt = require('jsonwebtoken');
 
 export class StoreController {
+
   constructor(
-    @repository(StoreRepository)
-    public storeRepository : StoreRepository,
+    @inject(RestBindings.Http.REQUEST) private req: Request,
+    @repository(StoreRepository) public storeRepository : StoreRepository,
+    @repository(UserStoreRepository) public userStoreRepository : UserStoreRepository,
   ) {}
 
-  @post('/stores', {
+  @post('/stores/create', {
     responses: {
       '200': {
         description: 'Store model instance',
@@ -33,6 +24,7 @@ export class StoreController {
       },
     },
   })
+  @secured(SecuredType.IS_AUTHENTICATED)
   async create(
     @requestBody({
       content: {
@@ -46,10 +38,21 @@ export class StoreController {
     })
     store: Omit<Store, 'id'>,
   ): Promise<Store> {
-    return this.storeRepository.create(store);
+    const newStore:Store = await this.storeRepository.create(store);
+    if(newStore.id){
+      const authorization = this.req.headers?.authorization?.split(' ')[1];
+      let idUser:number;
+      try {
+        idUser = jwt.verify(authorization,environment.JWT_SECRET).idUser;
+      } catch (e) {
+        throw new HttpErrors.Unauthorized('Invalid authorization');
+      }
+      await this.userStoreRepository.createUserStoreRelation(idUser, newStore.id);
+    }
+    return newStore;
   }
 
-  @get('/stores/count', {
+  /*@get('/stores/count', {
     responses: {
       '200': {
         description: 'Store model count',
@@ -61,9 +64,9 @@ export class StoreController {
     @param.where(Store) where?: Where<Store>,
   ): Promise<Count> {
     return this.storeRepository.count(where);
-  }
+  }*/
 
-  @get('/stores', {
+  /*@get('/stores', {
     responses: {
       '200': {
         description: 'Array of Store model instances',
@@ -82,9 +85,9 @@ export class StoreController {
     @param.filter(Store) filter?: Filter<Store>,
   ): Promise<Store[]> {
     return this.storeRepository.find(filter);
-  }
+  }*/
 
-  @patch('/stores', {
+  /*@patch('/stores', {
     responses: {
       '200': {
         description: 'Store PATCH success count',
@@ -104,9 +107,9 @@ export class StoreController {
     @param.where(Store) where?: Where<Store>,
   ): Promise<Count> {
     return this.storeRepository.updateAll(store, where);
-  }
+  }*/
 
-  @get('/stores/{id}', {
+  /*@get('/stores/{id}', {
     responses: {
       '200': {
         description: 'Store model instance',
@@ -123,9 +126,9 @@ export class StoreController {
     @param.filter(Store, {exclude: 'where'}) filter?: FilterExcludingWhere<Store>
   ): Promise<Store> {
     return this.storeRepository.findById(id, filter);
-  }
+  }*/
 
-  @patch('/stores/{id}', {
+  /*@patch('/stores/{id}', {
     responses: {
       '204': {
         description: 'Store PATCH success',
@@ -144,9 +147,9 @@ export class StoreController {
     store: Store,
   ): Promise<void> {
     await this.storeRepository.updateById(id, store);
-  }
+  }*/
 
-  @put('/stores/{id}', {
+  /*@put('/stores/{id}', {
     responses: {
       '204': {
         description: 'Store PUT success',
@@ -158,9 +161,9 @@ export class StoreController {
     @requestBody() store: Store,
   ): Promise<void> {
     await this.storeRepository.replaceById(id, store);
-  }
+  }*/
 
-  @del('/stores/{id}', {
+  /*@del('/stores/{id}', {
     responses: {
       '204': {
         description: 'Store DELETE success',
@@ -169,5 +172,5 @@ export class StoreController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.storeRepository.deleteById(id);
-  }
+  }*/
 }

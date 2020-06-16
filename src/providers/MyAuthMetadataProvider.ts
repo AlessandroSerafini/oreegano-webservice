@@ -1,6 +1,6 @@
-import {Constructor, CoreBindings, inject, MetadataInspector,} from '@loopback/core';
-import {AUTHENTICATION_METADATA_KEY, AuthMetadataProvider,} from '@loopback/authentication';
-import {MyAuthenticationMetadata} from "../utils/interfaces";
+import { Constructor, CoreBindings, inject, MetadataInspector, } from '@loopback/core';
+import { AUTHENTICATION_METADATA_KEY, AuthMetadataProvider, } from '@loopback/authentication';
+import { MyAuthenticationMetadata } from "../utils/interfaces";
 
 // metadata provider for `MyAuthenticationMetadata`. Will supply method's metadata when injected
 export class MyAuthMetadataProvider extends AuthMetadataProvider {

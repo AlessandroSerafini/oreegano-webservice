@@ -1,23 +1,5 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
-import {MisteryBoxRepository} from '../repositories';
-import {MisteryBox} from "../models/mistery-box.model";
+import { repository, } from '@loopback/repository';
+import { MisteryBoxRepository } from '../repositories';
 
 export class MisteryBoxController {
   constructor(
@@ -25,7 +7,7 @@ export class MisteryBoxController {
     public misteryBoxRepository : MisteryBoxRepository,
   ) {}
 
-  @post('/mistery-boxes', {
+  /*@post('/mistery-boxes', {
     responses: {
       '200': {
         description: 'MisteryBox model instance',
@@ -47,9 +29,9 @@ export class MisteryBoxController {
     misteryBox: Omit<MisteryBox, 'id'>,
   ): Promise<MisteryBox> {
     return this.misteryBoxRepository.create(misteryBox);
-  }
+  }*/
 
-  @get('/mistery-boxes/count', {
+  /*get('/mistery-boxes/count', {
     responses: {
       '200': {
         description: 'MisteryBox model count',
@@ -61,9 +43,9 @@ export class MisteryBoxController {
     @param.where(MisteryBox) where?: Where<MisteryBox>,
   ): Promise<Count> {
     return this.misteryBoxRepository.count(where);
-  }
+  }*/
 
-  @get('/mistery-boxes', {
+  /*@get('/mistery-boxes', {
     responses: {
       '200': {
         description: 'Array of MisteryBox model instances',
@@ -82,9 +64,9 @@ export class MisteryBoxController {
     @param.filter(MisteryBox) filter?: Filter<MisteryBox>,
   ): Promise<MisteryBox[]> {
     return this.misteryBoxRepository.find(filter);
-  }
+  }*/
 
-  @patch('/mistery-boxes', {
+  /*@patch('/mistery-boxes', {
     responses: {
       '200': {
         description: 'MisteryBox PATCH success count',
@@ -104,9 +86,9 @@ export class MisteryBoxController {
     @param.where(MisteryBox) where?: Where<MisteryBox>,
   ): Promise<Count> {
     return this.misteryBoxRepository.updateAll(misteryBox, where);
-  }
+  }*/
 
-  @get('/mistery-boxes/{id}', {
+  /*@get('/mistery-boxes/{id}', {
     responses: {
       '200': {
         description: 'MisteryBox model instance',
@@ -123,9 +105,9 @@ export class MisteryBoxController {
     @param.filter(MisteryBox, {exclude: 'where'}) filter?: FilterExcludingWhere<MisteryBox>
   ): Promise<MisteryBox> {
     return this.misteryBoxRepository.findById(id, filter);
-  }
+  }*/
 
-  @patch('/mistery-boxes/{id}', {
+  /*@patch('/mistery-boxes/{id}', {
     responses: {
       '204': {
         description: 'MisteryBox PATCH success',
@@ -144,9 +126,9 @@ export class MisteryBoxController {
     misteryBox: MisteryBox,
   ): Promise<void> {
     await this.misteryBoxRepository.updateById(id, misteryBox);
-  }
+  }*/
 
-  @put('/mistery-boxes/{id}', {
+  /*@put('/mistery-boxes/{id}', {
     responses: {
       '204': {
         description: 'MisteryBox PUT success',
@@ -158,9 +140,9 @@ export class MisteryBoxController {
     @requestBody() misteryBox: MisteryBox,
   ): Promise<void> {
     await this.misteryBoxRepository.replaceById(id, misteryBox);
-  }
+  }*/
 
-  @del('/mistery-boxes/{id}', {
+  /*@del('/mistery-boxes/{id}', {
     responses: {
       '204': {
         description: 'MisteryBox DELETE success',
@@ -169,5 +151,5 @@ export class MisteryBoxController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.misteryBoxRepository.deleteById(id);
-  }
+  }*/
 }

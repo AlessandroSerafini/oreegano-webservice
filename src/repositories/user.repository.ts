@@ -1,17 +1,15 @@
-import {Count, DefaultCrudRepository, repository} from '@loopback/repository';
-import {TesiAlessandroSerafiniWsDataSource} from '../datasources';
-import {inject} from '@loopback/core';
-import {User, UserRelations} from "../models/user.model";
-import {environment} from "../env/environment";
-import {HttpErrors} from "@loopback/rest";
-import {PasswordHasherBindings} from "../utils/namespaces";
-import {PasswordHasher} from "../services/hash.password.bcryptjs";
-import {UserRoleRepository} from "./user-role.repository";
-import {UserRoles} from "../utils/enums";
-import {promisify} from "util";
-import {sign} from "jsonwebtoken";
-import {UserRole} from "../models/user-role.model";
-import {Credentials} from "../utils/interfaces";
+import { Count, DefaultCrudRepository, repository } from '@loopback/repository';
+import { TesiAlessandroSerafiniWsDataSource } from '../datasources';
+import { inject } from '@loopback/core';
+import { User, UserRelations } from "../models/user.model";
+import { environment } from "../env/environment";
+import { HttpErrors } from "@loopback/rest";
+import { PasswordHasherBindings } from "../utils/namespaces";
+import { PasswordHasher } from "../services/hash.password.bcryptjs";
+import { promisify } from "util";
+import { sign } from "jsonwebtoken";
+import { Credentials } from "../utils/interfaces";
+import { UserStoreRepository } from "./user-store.repository";
 
 const signAsync = promisify(sign);
 
@@ -21,7 +19,7 @@ export class UserRepository extends DefaultCrudRepository<User,
     constructor(
         @inject('datasources.TesiAlessandroSerafiniWs') dataSource: TesiAlessandroSerafiniWsDataSource,
         @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher,
-        @repository(UserRoleRepository) public userRoleRepository: UserRoleRepository,
+        @repository(UserStoreRepository) public userStoreRepository: UserStoreRepository,
     ) {
         super(User, dataSource);
     }
@@ -49,24 +47,14 @@ export class UserRepository extends DefaultCrudRepository<User,
 
     public async getJwtToken(user: User): Promise<any> {
         const token = await this.generateToken(user);
-        const roles = await this.userRoleRepository.find({where: {idUser: user.id}});
 
         return {
             id: token,
             user: {
                 id: user.id,
                 email: user.email,
-                roles: roles.map((role: UserRole) => role.idRole)
             }
         }
-    }
-
-    public async updateUserPermissions(user: User, permissions: UserRoles): Promise<null> {
-        await this.userRoleRepository.create({
-            idUser: user.id,
-            idRole: permissions
-        });
-        return new Promise(resolve => resolve());
     }
 
     public async isPasswordMatched(credentials: Credentials, user: User): Promise<boolean> {

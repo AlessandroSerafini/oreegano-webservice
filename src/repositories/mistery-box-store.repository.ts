@@ -1,7 +1,7 @@
-import {DefaultCrudRepository} from '@loopback/repository';
-import {TesiAlessandroSerafiniWsDataSource} from '../datasources';
-import {inject} from '@loopback/core';
-import {MisteryBoxStore, MisteryBoxStoreRelations} from "../models/mistery-box-store.model";
+import { DefaultCrudRepository } from '@loopback/repository';
+import { TesiAlessandroSerafiniWsDataSource } from '../datasources';
+import { inject } from '@loopback/core';
+import { MisteryBoxStore, MisteryBoxStoreRelations } from "../models/mistery-box-store.model";
 
 export class MisteryBoxStoreRepository extends DefaultCrudRepository<
   MisteryBoxStore,

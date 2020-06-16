@@ -1,5 +1,5 @@
-import {Entity, hasOne, model, property} from '@loopback/repository';
-import {MisteryBoxStore} from "./mistery-box-store.model";
+import { Entity, hasOne, model, property } from '@loopback/repository';
+import { MisteryBoxStore } from "./mistery-box-store.model";
 
 @model()
 export class Store extends Entity {

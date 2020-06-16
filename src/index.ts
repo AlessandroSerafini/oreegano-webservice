@@ -1,5 +1,5 @@
-import {TesiAlessandroSerafiniWsApplication} from './application';
-import {ApplicationConfig} from '@loopback/core';
+import { TesiAlessandroSerafiniWsApplication } from './application';
+import { ApplicationConfig } from '@loopback/core';
 
 export {TesiAlessandroSerafiniWsApplication};
 

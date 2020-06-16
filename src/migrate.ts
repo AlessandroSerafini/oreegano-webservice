@@ -1,4 +1,4 @@
-import {TesiAlessandroSerafiniWsApplication} from './application';
+import { TesiAlessandroSerafiniWsApplication } from './application';
 
 export async function migrate(args: string[]) {
   const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';

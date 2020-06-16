@@ -1,6 +1,5 @@
-import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
-import {juggler} from '@loopback/repository';
-import {RoleRepository} from "../repositories";
+import { inject, lifeCycleObserver, LifeCycleObserver } from '@loopback/core';
+import { juggler } from '@loopback/repository';
 
 const config = {
   name: 'TesiAlessandroSerafiniWs',
@@ -35,7 +34,5 @@ export class TesiAlessandroSerafiniWsDataSource extends juggler.DataSource
    */
   async start(): Promise<void> {
     // Add your logic here to be invoked when the application is started
-    const roleRepository = new RoleRepository(this);
-    await roleRepository.initValues();
   }
 }
