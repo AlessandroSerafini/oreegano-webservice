@@ -1,5 +1,7 @@
 import { AuthenticationMetadata, } from '@loopback/authentication';
 import { SecuredType } from "./enums";
+import { User } from "../models/user.model";
+import { property } from "@loopback/repository";
 
 // extended interface of the default AuthenticationMetadata which only has `strategy` and `options`
 export interface MyAuthenticationMetadata extends AuthenticationMetadata {
@@ -10,6 +12,10 @@ export interface MyAuthenticationMetadata extends AuthenticationMetadata {
 // the required interface to filter login payload
 export interface JwtStructure {
   idUser: number;
+}
+export interface JwtResponse {
+  id: string;
+  user: Omit<User, 'password'>
 }
 
 export interface RichedActivactionCode {

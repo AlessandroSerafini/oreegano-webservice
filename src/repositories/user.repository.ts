@@ -8,7 +8,7 @@ import { PasswordHasherBindings } from "../utils/namespaces";
 import { PasswordHasher } from "../services/hash.password.bcryptjs";
 import { promisify } from "util";
 import { sign } from "jsonwebtoken";
-import { Credentials } from "../utils/interfaces";
+import { Credentials, JwtResponse } from "../utils/interfaces";
 import { UserStoreRepository } from "./user-store.repository";
 
 const signAsync = promisify(sign);
@@ -45,15 +45,13 @@ export class UserRepository extends DefaultCrudRepository<User,
         return signAsync(tokenObject, environment.JWT_SECRET);
     }
 
-    public async getJwtToken(user: User): Promise<any> {
+    public async getJwtToken(user: User): Promise<JwtResponse> {
         const token = await this.generateToken(user);
-
+        const res:User = JSON.parse(JSON.stringify(user));
+        delete res.password;
         return {
             id: token,
-            user: {
-                id: user.id,
-                email: user.email,
-            }
+            user: res
         }
     }
 

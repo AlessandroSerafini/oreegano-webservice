@@ -5,7 +5,7 @@ import { inject } from "@loopback/context";
 import { PasswordHasherBindings } from "../utils/namespaces";
 import { PasswordHasher } from "../services/hash.password.bcryptjs";
 import { UserRepository } from "../repositories";
-import { Credentials } from "../utils/interfaces";
+import { Credentials, JwtResponse } from "../utils/interfaces";
 import { EmailService } from "../services/email.service";
 import moment = require("moment");
 
@@ -30,19 +30,19 @@ export class UserController {
         },
     })
     async create(
-        @param.header.string('apiKey') apiKey = '',
-        @requestBody({
-            content: {
-                'application/json': {
-                    schema: getModelSchemaRef(User, {
-                        title: 'NewUser',
-                        exclude: ['id', 'pswRecToken', 'pswRecTokenExpireDate', 'pswRecExpireDate'],
-                    }),
-                },
-            },
-        })
-            user: Omit<User, 'id'>,
-    ): Promise<User> {
+      @param.header.string('apiKey') apiKey = '',
+      @requestBody({
+          content: {
+              'application/json': {
+                  schema: getModelSchemaRef(User, {
+                      title: 'NewUser',
+                      exclude: ['id', 'pswRecToken', 'pswRecTokenExpireDate', 'pswRecExpireDate'],
+                  }),
+              },
+          },
+      })
+        user: Omit<User, 'id'>,
+    ): Promise<JwtResponse> {
         this.userRepository.handleApiKeyAuth(apiKey);
         if (!this.userRepository.validateEmail(user.email))
             throw new HttpErrors.BadRequest('E-mail address isn\'t valid');
