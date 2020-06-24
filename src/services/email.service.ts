@@ -36,8 +36,8 @@ export class EmailService {
   }
 
   public async sendPassword(user: User): Promise<any> {
-    const subject = 'Tesi Alessandro Serafini: Password recovery';
-    const url: string = environment.BASE_APP_URL + '://recovery-password/' + user.pswRecToken;
+    const subject = 'oreegano: Password recovery';
+    const url: string = environment.BASE_APP_URL + 'reset-password/' + user.pswRecToken;
     let template: string = await this.readdirAsync('./src/mails-templates/password-recovery.html');
 
     const mapObj:any = {

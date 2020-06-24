@@ -1,10 +1,10 @@
-import { TesiAlessandroSerafiniWsApplication } from './application';
+import { OreeganoWsApplication } from './application';
 import { ApplicationConfig } from '@loopback/core';
 
-export {TesiAlessandroSerafiniWsApplication};
+export {OreeganoWsApplication};
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new TesiAlessandroSerafiniWsApplication(options);
+  const app = new OreeganoWsApplication(options);
   await app.boot();
   await app.start();
 

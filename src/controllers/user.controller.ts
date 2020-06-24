@@ -177,7 +177,7 @@ export class UserController {
           },
       })
         data: any,
-    ): Promise<any> {
+    ): Promise<JwtResponse> {
         this.userRepository.handleApiKeyAuth(apiKey);
         const user: User | null = await this.userRepository.findOne({where: {pswRecToken: token}});
 
@@ -190,12 +190,15 @@ export class UserController {
         if (user.pswRecTokenExpireDate && moment(moment()).isSameOrAfter(user.pswRecTokenExpireDate))
             throw new HttpErrors.BadRequest('This token is expired. You have to require password reset again.');
 
-        return this.userRepository.updateById(user.id, {
+        await this.userRepository.updateById(user.id, {
             password: await this.passwordHasher.hashPassword(data.password),
             pswRecToken: undefined,
             pswRecTokenExpireDate: undefined,
             pswRecExpireDate: undefined
         })
+
+        const newUserData: User = await this.userRepository.findById(user.id);
+        return new Promise(resolve => resolve(this.userRepository.getJwtToken(newUserData)));
     }
 
     /*@get('/users/count', {

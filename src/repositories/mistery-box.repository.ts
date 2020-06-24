@@ -1,5 +1,5 @@
 import { DefaultCrudRepository } from '@loopback/repository';
-import { TesiAlessandroSerafiniWsDataSource } from '../datasources';
+import { OreeganoWsDataSource } from '../datasources';
 import { inject } from '@loopback/core';
 import { MisteryBox, MisteryBoxRelations } from "../models/mistery-box.model";
 
@@ -9,7 +9,7 @@ export class MisteryBoxRepository extends DefaultCrudRepository<
   MisteryBoxRelations
 > {
   constructor(
-    @inject('datasources.TesiAlessandroSerafiniWs') dataSource: TesiAlessandroSerafiniWsDataSource,
+    @inject('datasources.OreeganoWs') dataSource: OreeganoWsDataSource,
   ) {
     super(MisteryBox, dataSource);
   }

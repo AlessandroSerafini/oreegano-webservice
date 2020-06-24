@@ -1,5 +1,5 @@
 import { Count, DefaultCrudRepository, repository } from '@loopback/repository';
-import { TesiAlessandroSerafiniWsDataSource } from '../datasources';
+import { OreeganoWsDataSource } from '../datasources';
 import { inject } from '@loopback/core';
 import { User, UserRelations } from "../models/user.model";
 import { environment } from "../env/environment";
@@ -17,7 +17,7 @@ export class UserRepository extends DefaultCrudRepository<User,
     typeof User.prototype.id,
     UserRelations> {
     constructor(
-        @inject('datasources.TesiAlessandroSerafiniWs') dataSource: TesiAlessandroSerafiniWsDataSource,
+        @inject('datasources.OreeganoWs') dataSource: OreeganoWsDataSource,
         @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher,
         @repository(UserStoreRepository) public userStoreRepository: UserStoreRepository,
     ) {

@@ -1,5 +1,5 @@
 import { DefaultCrudRepository } from '@loopback/repository';
-import { TesiAlessandroSerafiniWsDataSource } from '../datasources';
+import { OreeganoWsDataSource } from '../datasources';
 import { inject } from '@loopback/core';
 import { Store, StoreRelations } from "../models/store.model";
 
@@ -9,7 +9,7 @@ export class StoreRepository extends DefaultCrudRepository<
   StoreRelations
 > {
   constructor(
-    @inject('datasources.TesiAlessandroSerafiniWs') dataSource: TesiAlessandroSerafiniWsDataSource,
+    @inject('datasources.OreeganoWs') dataSource: OreeganoWsDataSource,
   ) {
     super(Store, dataSource);
   }

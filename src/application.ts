@@ -23,7 +23,7 @@ export interface PackageInfo {
 
 const pkg: PackageInfo = require('../package.json');
 
-export class TesiAlessandroSerafiniWsApplication extends BootMixin(
+export class OreeganoWsApplication extends BootMixin(
     ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
     constructor(options: ApplicationConfig = {}) {

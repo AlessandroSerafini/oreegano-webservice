@@ -1,1 +1,1 @@
-export * from './tesi-alessandro-serafini-ws.datasource';
+export * from './oreegano.datasource';
