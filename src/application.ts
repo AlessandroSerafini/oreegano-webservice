@@ -1,19 +1,19 @@
-import { BootMixin } from '@loopback/boot';
-import { ApplicationConfig } from '@loopback/core';
-import { RestExplorerBindings, RestExplorerComponent, } from '@loopback/rest-explorer';
-import { RepositoryMixin } from '@loopback/repository';
-import { RestApplication } from '@loopback/rest';
-import { ServiceMixin } from '@loopback/service-proxy';
+import {BootMixin} from '@loopback/boot';
+import {ApplicationConfig} from '@loopback/core';
+import {RestExplorerBindings, RestExplorerComponent,} from '@loopback/rest-explorer';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
+import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
-import { MySequence } from './sequence';
-import { EmailServiceBindings, MyAuthBindings, PasswordHasherBindings } from "./utils/namespaces";
-import { MyAuthAuthenticationStrategyProvider } from "./providers/MyAuthAuthenticationStrategyProvider";
-import { MyAuthMetadataProvider } from "./providers/MyAuthMetadataProvider";
-import { MyAuthActionProvider } from "./providers/MyAuthActionProvider";
-import { BcryptHasher } from "./services/hash.password.bcryptjs";
-import { AuthenticationBindings } from "@loopback/authentication";
-import { SECURITY_SCHEME_SPEC } from "./utils/enums";
-import { EmailService } from "./services/email.service";
+import {MySequence} from './sequence';
+import {EmailServiceBindings, MyAuthBindings, PasswordHasherBindings} from "./utils/namespaces";
+import {MyAuthAuthenticationStrategyProvider} from "./providers/MyAuthAuthenticationStrategyProvider";
+import {MyAuthMetadataProvider} from "./providers/MyAuthMetadataProvider";
+import {MyAuthActionProvider} from "./providers/MyAuthActionProvider";
+import {BcryptHasher} from "./services/hash.password.bcryptjs";
+import {AuthenticationBindings} from "@loopback/authentication";
+import {SECURITY_SCHEME_SPEC} from "./utils/enums";
+import {EmailService} from "./services/email.service";
 
 export interface PackageInfo {
     name: string;
@@ -58,6 +58,17 @@ export class OreeganoWsApplication extends BootMixin(
         this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
 
         this.bind(EmailServiceBindings.EMAIL_SERVICE).toClass(EmailService);
+
+
+        const io = require("socket.io");
+        const server = io.listen(4200);
+
+        server.on("connection", function(socket) {
+            console.log("PASSO", "SOCKET FROM WS", "user connected");
+            socket.emit("welcome", "MESSAGE FROM WS");
+        });
+
+
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here

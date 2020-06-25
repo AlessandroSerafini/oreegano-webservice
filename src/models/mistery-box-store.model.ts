@@ -1,7 +1,6 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Store} from "./store.model";
 import {MisteryBox} from "./mistery-box.model";
-import {User} from "./user.model";
 
 @model()
 export class MisteryBoxStore extends Entity {

@@ -1,4 +1,4 @@
-import { ReferenceObject, SecuritySchemeObject } from '@loopback/openapi-v3';
+import {ReferenceObject, SecuritySchemeObject} from '@loopback/openapi-v3';
 
 export const JWT_STRATEGY_NAME = 'jwt';
 

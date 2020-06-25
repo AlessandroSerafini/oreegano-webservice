@@ -1,7 +1,7 @@
-import { BindingKey, } from '@loopback/core';
-import { AuthenticationStrategy, } from '@loopback/authentication';
-import { PasswordHasher } from "../services/hash.password.bcryptjs";
-import { EmailService } from "../services/email.service";
+import {BindingKey,} from '@loopback/core';
+import {AuthenticationStrategy,} from '@loopback/authentication';
+import {PasswordHasher} from "../services/hash.password.bcryptjs";
+import {EmailService} from "../services/email.service";
 
 // implement custom namespace bindings
 export namespace MyAuthBindings {

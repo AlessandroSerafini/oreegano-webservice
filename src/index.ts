@@ -1,5 +1,5 @@
-import { OreeganoWsApplication } from './application';
-import { ApplicationConfig } from '@loopback/core';
+import {OreeganoWsApplication} from './application';
+import {ApplicationConfig} from '@loopback/core';
 
 export {OreeganoWsApplication};
 

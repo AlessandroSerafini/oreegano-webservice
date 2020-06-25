@@ -1,4 +1,4 @@
-import { OreeganoWsApplication } from './application';
+import {OreeganoWsApplication} from './application';
 
 export async function migrate(args: string[]) {
   const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';

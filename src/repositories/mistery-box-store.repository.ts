@@ -1,7 +1,7 @@
-import { DefaultCrudRepository } from '@loopback/repository';
-import { OreeganoWsDataSource } from '../datasources';
-import { inject } from '@loopback/core';
-import { MisteryBoxStore, MisteryBoxStoreRelations } from "../models/mistery-box-store.model";
+import {DefaultCrudRepository} from '@loopback/repository';
+import {OreeganoWsDataSource} from '../datasources';
+import {inject} from '@loopback/core';
+import {MisteryBoxStore, MisteryBoxStoreRelations} from "../models/mistery-box-store.model";
 
 export class MisteryBoxStoreRepository extends DefaultCrudRepository<
   MisteryBoxStore,
@@ -12,5 +12,13 @@ export class MisteryBoxStoreRepository extends DefaultCrudRepository<
     @inject('datasources.OreeganoWs') dataSource: OreeganoWsDataSource,
   ) {
     super(MisteryBoxStore, dataSource);
+  }
+
+  public async createStoreMisteryBoxRelation(idMisteryBox: number, idStore: number): Promise<null> {
+    await this.create({
+      idMisteryBox,
+      idStore
+    });
+    return new Promise(resolve => resolve());
   }
 }

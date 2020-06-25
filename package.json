@@ -58,20 +58,21 @@
     "loopback-connector-mysql": "^5.4.3",
     "moment": "^2.26.0",
     "nodemailer": "^6.4.8",
-    "passport-jwt": "^4.0.0"
+    "passport-jwt": "^4.0.0",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@loopback/build": "^5.4.3",
-    "source-map-support": "^0.5.19",
+    "@loopback/eslint-config": "^8.0.1",
     "@loopback/testlab": "^3.1.7",
     "@types/node": "^10.17.26",
-    "@typescript-eslint/parser": "^2.31.0",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
-    "@loopback/eslint-config": "^8.0.1",
+    "@typescript-eslint/parser": "^2.31.0",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-eslint-plugin": "^2.2.1",
     "eslint-plugin-mocha": "^7.0.0",
+    "source-map-support": "^0.5.19",
     "typescript": "~3.9.5"
   },
   "nodemonConfig": {

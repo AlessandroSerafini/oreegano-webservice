@@ -1,5 +1,5 @@
-import { environment } from "../env/environment";
-import { User } from "../models/user.model";
+import {environment} from "../env/environment";
+import {User} from "../models/user.model";
 
 
 const fs = require('fs');

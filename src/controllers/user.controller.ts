@@ -1,14 +1,13 @@
-import { repository, } from '@loopback/repository';
-import { getModelSchemaRef, HttpErrors, param, post, requestBody, } from '@loopback/rest';
-import { User } from "../models/user.model";
-import { inject } from "@loopback/context";
-import { PasswordHasherBindings } from "../utils/namespaces";
-import { PasswordHasher } from "../services/hash.password.bcryptjs";
-import { UserRepository } from "../repositories";
-import { Credentials, JwtResponse } from "../utils/interfaces";
-import { EmailService } from "../services/email.service";
+import {repository,} from '@loopback/repository';
+import {getModelSchemaRef, HttpErrors, param, post, requestBody,} from '@loopback/rest';
+import {User} from "../models/user.model";
+import {inject} from "@loopback/context";
+import {PasswordHasherBindings} from "../utils/namespaces";
+import {PasswordHasher} from "../services/hash.password.bcryptjs";
+import {UserRepository} from "../repositories";
+import {Credentials, JwtResponse} from "../utils/interfaces";
+import {EmailService} from "../services/email.service";
 import moment = require("moment");
-import {UserRoles} from "../utils/enums";
 
 const PSW_REC_INTERVAL_HOURS = 24;
 const PSW_REC_TOKEN_INTERVAL_HOURS = 168;
