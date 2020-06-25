@@ -8,6 +8,7 @@ import { UserRepository } from "../repositories";
 import { Credentials, JwtResponse } from "../utils/interfaces";
 import { EmailService } from "../services/email.service";
 import moment = require("moment");
+import {UserRoles} from "../utils/enums";
 
 const PSW_REC_INTERVAL_HOURS = 24;
 const PSW_REC_TOKEN_INTERVAL_HOURS = 168;
@@ -22,6 +23,7 @@ export class UserController {
     }
 
     @post('/users/signup', {
+        operationId: 'Signup',
         responses: {
             '200': {
                 description: 'User model instance',
@@ -55,6 +57,7 @@ export class UserController {
     }
 
     @post('/users/signin', {
+        operationId: 'Signin',
         responses: {
             '200': {
                 description: 'JWT model instance'
@@ -154,6 +157,7 @@ export class UserController {
     }
 
     @post('/users/password-reset/{token}', {
+        operationId: 'Reset password',
         responses: {
             '200': {
                 description: 'Password RESET success',

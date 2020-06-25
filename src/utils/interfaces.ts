@@ -1,12 +1,11 @@
 import { AuthenticationMetadata, } from '@loopback/authentication';
 import { SecuredType } from "./enums";
 import { User } from "../models/user.model";
-import { property } from "@loopback/repository";
 
 // extended interface of the default AuthenticationMetadata which only has `strategy` and `options`
 export interface MyAuthenticationMetadata extends AuthenticationMetadata {
   type: SecuredType;
-  roles: number[];
+  role: number;
 }
 
 // the required interface to filter login payload

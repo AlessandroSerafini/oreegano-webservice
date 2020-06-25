@@ -6,13 +6,13 @@ export const JWT_STRATEGY_NAME = 'jwt';
 export enum SecuredType {
   IS_AUTHENTICATED, // any authenticated user
   PERMIT_ALL,       // bypass security check, permit everyone
-  HAS_ROLES,        // user mast have all roles specified in the `roles` attribute
+  HAS_ROLE,        // user mast have all roles specified in the `roles` attribute
   DENY_ALL,         // you shall not pass!
 }
 
 export enum UserRoles {
   CUSTOMER = 1,
-  STORE = 2
+  DELIVERY = 2,
 }
 
 export const OPERATION_SECURITY_SPEC = [{bearerAuth: []}];

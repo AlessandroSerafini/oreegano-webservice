@@ -17,6 +17,7 @@ export class StoreController {
   ) {}
 
   @post('/stores/create', {
+    operationId: 'Create store',
     responses: {
       '200': {
         description: 'Store model instance',

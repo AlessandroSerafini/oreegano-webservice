@@ -14,7 +14,7 @@ export class User extends Entity {
         type: 'number',
         required: true,
     })
-    type: UserRoles;
+    role: UserRoles;
 
     @property({
         type: 'string',

@@ -8,14 +8,14 @@ import { MyAuthenticationMetadata } from "../utils/interfaces";
 // we will use 'secured' to match Spring Security annotation.
 export function secured(
   type: SecuredType = SecuredType.IS_AUTHENTICATED, // more on this below
-  roles: number[] = [],
+  role = 0,
   strategy: string = 'jwt',
   options?: object,
 ) {
   // we will use a custom interface. more on this below
   return MethodDecoratorFactory.createDecorator<MyAuthenticationMetadata>(AUTHENTICATION_METADATA_KEY, {
     type,
-    roles,
+    role,
     strategy,
     options,
   });

@@ -1,10 +1,9 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {Store} from "./store.model";
 import {MisteryBox} from "./mistery-box.model";
 import {User} from "./user.model";
 
 @model()
-export class MisteryBoxStore extends Entity {
+export class MisteryBoxUser extends Entity {
     @property({
         type: 'number',
         id: true,
@@ -16,17 +15,17 @@ export class MisteryBoxStore extends Entity {
     @belongsTo(() => MisteryBox, {name: "misteryBox"})
     idMisteryBox: number;
 
-    @belongsTo(() => Store, {name: "store"})
-    idStore: number;
+    @belongsTo(() => User, {name: "user"})
+    idUser: number;
 
 
-    constructor(data?: Partial<MisteryBoxStore>) {
+    constructor(data?: Partial<MisteryBoxUser>) {
         super(data);
     }
 }
 
-export interface MisteryBoxStoreRelations {
+export interface MisteryBoxUserRelations {
 
 }
 
-export type MisteryBoxStoreWithRelations = MisteryBoxStore & MisteryBoxStoreRelations;
+export type MisteryBoxUserWithRelations = MisteryBoxUser & MisteryBoxUserRelations;

@@ -2,8 +2,6 @@ import {DefaultCrudRepository} from '@loopback/repository';
 import {OreeganoWsDataSource} from '../datasources';
 import {inject} from '@loopback/core';
 import { UserStore, UserStoreRelations } from "../models/user-store.model";
-import { User } from "../models/user.model";
-import { UserRoles } from "../utils/enums";
 
 export class UserStoreRepository extends DefaultCrudRepository<
   UserStore,
