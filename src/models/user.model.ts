@@ -1,5 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {UserRoles} from "../utils/enums";
+import {Address} from './address.model';
+import {Store} from './store.model';
 
 @model()
 export class User extends Entity {
@@ -52,6 +54,11 @@ export class User extends Entity {
     })
     pswRecExpireDate?: Date;
 
+  @hasMany(() => Address)
+  addresses: Address[];
+
+  @hasMany(() => Store)
+  stores: Store[];
 
     constructor(data?: Partial<User>) {
         super(data);

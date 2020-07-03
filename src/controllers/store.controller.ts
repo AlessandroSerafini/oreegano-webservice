@@ -1,11 +1,11 @@
 import {repository,} from '@loopback/repository';
-import {getModelSchemaRef, post, Request, requestBody, RestBindings,} from '@loopback/rest';
+import {get, getModelSchemaRef, param, Request, RestBindings,} from '@loopback/rest';
 import {Store} from "../models/store.model";
-import {StoreRepository, UserStoreRepository} from "../repositories";
+import {StoreRepository} from "../repositories";
 import {secured} from "../decorators/secured";
-import {SecuredType, UserRoles} from "../utils/enums";
+import {SecuredType} from "../utils/enums";
 import {inject} from "@loopback/context";
-import {environment} from "../env/environment";
+import {MisteryBox} from "../models";
 
 const jwt = require('jsonwebtoken');
 
@@ -14,39 +14,46 @@ export class StoreController {
     constructor(
         @inject(RestBindings.Http.REQUEST) private req: Request,
         @repository(StoreRepository) public storeRepository: StoreRepository,
-        @repository(UserStoreRepository) public userStoreRepository: UserStoreRepository,
     ) {
     }
 
-    @post('/stores/create', {
-        operationId: 'Create store',
+    @get('/stores/near-me', {
+        operationId: 'Stores near me',
         responses: {
             '200': {
-                description: 'Store model instance',
-                content: {'application/json': {schema: getModelSchemaRef(Store)}},
+                description: 'Array of Stores model instances',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'array',
+                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
+                        },
+                    },
+                },
             },
         },
     })
-    @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
-    async create(
-        @requestBody({
-            content: {
-                'application/json': {
-                    schema: getModelSchemaRef(Store, {
-                        title: 'NewStore',
-                        exclude: ['id'],
-                    }),
-                },
-            },
-        })
-            store: Omit<Store, 'id'>,
-    ): Promise<Store> {
-        const newStore: Store = await this.storeRepository.create(store);
-        if (newStore.id) {
-            const idUser = jwt.verify(this.req.headers?.authorization?.split(' ')[1], environment.JWT_SECRET).idUser;
-            await this.userStoreRepository.createUserStoreRelation(idUser, newStore.id);
+    @secured(SecuredType.IS_AUTHENTICATED)
+    async find(
+        @param.header.number('lat') currentLat,
+        @param.header.number('lon') currentLon,
+    ): Promise<Store[]> {
+        let res: Store[] = [];
+        const distanceFromMe = 25;
+        const nearMeQuery = `SELECT id, SQRT( POW(69.1 * (lat - ${currentLat}), 2) + POW(69.1 * (${currentLon} - lon) * COS(lat / 57.3), 2)) AS distance FROM Store HAVING distance < ${distanceFromMe} ORDER BY distance`;
+        const nearMeStoresIds: any[] = await this.storeRepository.dataSource.execute(nearMeQuery);
+        const misteryBoxStoreFilter: any[] = [];
+        if (nearMeStoresIds.length > 0) {
+            nearMeStoresIds.forEach((store) => {
+                misteryBoxStoreFilter.push({idStore: store.id});
+            });
+
+            res = await this.storeRepository.find({
+                where: {or: misteryBoxStoreFilter},
+                include: [{relation: 'misteryBoxes'}]
+            });
         }
-        return newStore;
+        return res;
     }
 
     /*@get('/stores/count', {
