@@ -1,17 +1,17 @@
-import {Count, repository,} from '@loopback/repository';
+import {Count, Filter, repository,} from '@loopback/repository';
 import {
     MisteryBoxRepository,
     MisteryBoxStoreRepository,
-    MisteryBoxTrackingRepository, StoreRepository,
-    UserRepository, UserStoreRepository
+    MisteryBoxTrackingRepository,
+    StoreRepository,
+    UserRepository,
+    UserStoreRepository
 } from '../repositories';
-import {getModelSchemaRef, HttpErrors, post, Request, requestBody, RestBindings} from "@loopback/rest";
+import {get, getModelSchemaRef, HttpErrors, param, post, Request, requestBody, RestBindings} from "@loopback/rest";
 import {secured} from "../decorators/secured";
 import {SecuredType, UserRoles} from "../utils/enums";
 import {MisteryBox} from "../models/mistery-box.model";
 import {MisteryBoxTracking} from "../models/mistery-box-tracking.model";
-import {User} from "../models/user.model";
-import {Store} from "../models/store.model";
 import {MisteryBoxStore} from "../models/mistery-box-store.model";
 import {UserStore} from "../models/user-store.model";
 import {inject} from "@loopback/context";
@@ -118,6 +118,65 @@ export class MisteryBoxController {
             idMisteryBox,
             idCustomer: idUser,
         });
+    }
+
+    @get('/mistery-boxes/near-me', {
+        operationId: 'Find mistery boxes near me',
+        responses: {
+            '200': {
+                description: 'Array of MisteryBox model instances',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'array',
+                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @secured(SecuredType.IS_AUTHENTICATED)
+    async find(
+        @param.header.number('lat') currentLat,
+        @param.header.number('lon') currentLon,
+    ): Promise<MisteryBox[]> {
+        let res: MisteryBox[] = [];
+        const distanceFromMe = 25;
+        const nearMeQuery = `SELECT id, SQRT( POW(69.1 * (lat - ${currentLat}), 2) + POW(69.1 * (${currentLon} - lon) * COS(lat / 57.3), 2)) AS distance FROM Store HAVING distance < ${distanceFromMe} ORDER BY distance`;
+        const nearMeStoresIds: any[] = await this.storeRepository.dataSource.execute(nearMeQuery);
+        const misteryBoxStoreFilter: any[] = [];
+
+
+        if (nearMeStoresIds.length > 0) {
+            nearMeStoresIds.forEach((store) => {
+                misteryBoxStoreFilter.push({idStore: store.id});
+            });
+
+            console.log(await this.storeRepository.find({
+                where: {or: misteryBoxStoreFilter},
+                include: [{relation: 'misteryBoxes'}]
+            }));
+        }
+
+        /*const misteryBoxFilter: any[] = [];
+        if (nearMeStoresIds.length > 0) {
+            nearMeStoresIds.forEach((store) => {
+                misteryBoxStoreFilter.push({idStore: store.id});
+            });
+            const misteryBoxStoreRelations: MisteryBoxStore[] | null = await this.misteryBoxStoreRepository.find({where: {or: misteryBoxStoreFilter}});
+            if (misteryBoxStoreRelations.length > 0) {
+                misteryBoxStoreRelations.forEach((misteryBox) => {
+                    misteryBoxFilter.push({id: misteryBox.idMisteryBox});
+                });
+                res = await this.misteryBoxRepository.find({
+                    where: {or: misteryBoxFilter},
+                    include: [{relation: 'misteryBoxStore'}]
+                });
+            }
+        }*/
+        // TODO: INCLUDERE TRAMITE I METODI DI LB4 ANCHE I DATI SULLO STORE
+        return res;
     }
 
     /*@post('/mistery-boxes', {

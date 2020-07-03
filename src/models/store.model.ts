@@ -1,5 +1,6 @@
-import {Entity, hasOne, model, property} from '@loopback/repository';
+import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {MisteryBoxStore} from "./mistery-box-store.model";
+import {MisteryBox} from "./mistery-box.model";
 
 @model()
 export class Store extends Entity {
@@ -19,18 +20,24 @@ export class Store extends Entity {
     title: string;
 
     @property({
-        type: 'string',
+        type: 'number',
         generated: false,
         required: true,
+        mysql: {
+            dataType: 'float',
+        }
     })
-    lat: string;
+    lat: number;
 
     @property({
-        type: 'string',
+        type: 'number',
         generated: false,
         required: true,
+        mysql: {
+            dataType: 'float',
+        }
     })
-    lon: string;
+    lon: number;
 
     @property({
         type: 'string',
@@ -60,8 +67,8 @@ export class Store extends Entity {
     })
     haveDelivery?: boolean;
 
-    @hasOne(() => MisteryBoxStore)
-    misteryBoxStore?: MisteryBoxStore;
+    @hasMany(() => MisteryBox)
+    misteryBoxes?: MisteryBox[];
 
     constructor(data?: Partial<Store>) {
         super(data);

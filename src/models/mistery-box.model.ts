@@ -29,8 +29,21 @@ export class MisteryBox extends Entity {
         type: 'number',
         generated: false,
         required: true,
+        mysql: {
+            dataType: 'float',
+        }
     })
     price: number;
+
+    @property({
+        type: 'number',
+        generated: false,
+        required: false,
+        mysql: {
+            dataType: 'float',
+        }
+    })
+    oldPrice?: number;
 
     @property({
         type: 'string',
@@ -45,13 +58,6 @@ export class MisteryBox extends Entity {
         required: false,
     })
     available: number;
-
-    @property({
-        type: 'number',
-        generated: false,
-        required: false,
-    })
-    oldPrice?: number;
 
     @hasOne(() => MisteryBoxStore)
     misteryBoxStore?: MisteryBoxStore;
