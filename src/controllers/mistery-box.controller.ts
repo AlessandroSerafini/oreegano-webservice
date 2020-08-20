@@ -1,6 +1,6 @@
 import {repository,} from '@loopback/repository';
 import {MisteryBoxRepository, StoreRepository, UserRepository,} from '../repositories';
-import {MisteryBox} from "../models";
+import {MisteryBox} from "../models/mistery-box.model";
 import {get, getModelSchemaRef, param} from '@loopback/rest';
 import {secured} from "../decorators/secured";
 import {SecuredType, UserRoles} from "../utils/enums";
@@ -13,13 +13,11 @@ interface CreateMisteryBoxBody {
 
 
 export class MisteryBoxController {
-
     constructor(
         @repository(MisteryBoxRepository) public misteryBoxRepository: MisteryBoxRepository,
         @repository(StoreRepository) public storeRepository: StoreRepository,
         @repository(UserRepository) public userRepository: UserRepository,
     ) {
-
     }
 
     @get('/mistery-boxes/near-me', {
@@ -95,7 +93,14 @@ export class MisteryBoxController {
     @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
     async findLatest(): Promise<MisteryBox[]> {
 
-        const res: MisteryBox[] = await this.misteryBoxRepository.find({include: [{relation: 'store'}]});
+        const res: MisteryBox[] = await this.misteryBoxRepository.find({
+            where: {
+                and: [
+                    {available: {gt: 1, lte: 4}},
+                    {date: {gte: moment().startOf('day').toDate()}}
+                ],
+            }
+        });
         return res;
     }
 
