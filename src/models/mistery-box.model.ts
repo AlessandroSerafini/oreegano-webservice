@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
+import {Store} from "./store.model";
 
 @model()
 export class MisteryBox extends Entity {
@@ -25,12 +26,19 @@ export class MisteryBox extends Entity {
   description: string;
 
   @property({
+    type: 'string',
+    generated: false,
+    required: true,
+  })
+  imageUrl: string;
+
+  @property({
     type: 'number',
     generated: false,
     required: true,
-    mysql: {
-      dataType: 'float',
-    }
+    dataType: 'decimal',
+    precision: 12,
+    scale: 2
   })
   price: number;
 
@@ -38,14 +46,14 @@ export class MisteryBox extends Entity {
     type: 'number',
     generated: false,
     required: false,
-    mysql: {
-      dataType: 'float',
-    }
+    dataType: 'decimal',
+    precision: 12,
+    scale: 2
   })
   oldPrice?: number;
 
   @property({
-    type: 'string',
+    type: 'date',
     generated: false,
     required: false,
   })
@@ -58,10 +66,8 @@ export class MisteryBox extends Entity {
   })
   available: number;
 
-  @property({
-    type: 'number',
-  })
-  storeId?: number;
+  @belongsTo(() => Store, {name: 'store'})
+  storeId: number; // customized foreign key name
 
   constructor(data?: Partial<MisteryBox>) {
     super(data);

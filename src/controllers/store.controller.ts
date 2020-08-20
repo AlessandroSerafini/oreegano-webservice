@@ -1,11 +1,7 @@
 import {repository,} from '@loopback/repository';
-import {get, getModelSchemaRef, param, Request, RestBindings,} from '@loopback/rest';
-import {Store} from "../models/store.model";
+import {Request, RestBindings,} from '@loopback/rest';
 import {StoreRepository} from "../repositories";
-import {secured} from "../decorators/secured";
-import {SecuredType} from "../utils/enums";
 import {inject} from "@loopback/context";
-import {MisteryBox} from "../models";
 
 const jwt = require('jsonwebtoken');
 
@@ -15,45 +11,6 @@ export class StoreController {
         @inject(RestBindings.Http.REQUEST) private req: Request,
         @repository(StoreRepository) public storeRepository: StoreRepository,
     ) {
-    }
-
-    @get('/stores/near-me', {
-        operationId: 'Stores near me',
-        responses: {
-            '200': {
-                description: 'Array of Stores model instances',
-                content: {
-                    'application/json': {
-                        schema: {
-                            type: 'array',
-                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
-                        },
-                    },
-                },
-            },
-        },
-    })
-    @secured(SecuredType.IS_AUTHENTICATED)
-    async find(
-        @param.header.number('lat') currentLat,
-        @param.header.number('lon') currentLon,
-    ): Promise<Store[]> {
-        let res: Store[] = [];
-        const distanceFromMe = 25;
-        const nearMeQuery = `SELECT id, SQRT( POW(69.1 * (lat - ${currentLat}), 2) + POW(69.1 * (${currentLon} - lon) * COS(lat / 57.3), 2)) AS distance FROM Store HAVING distance < ${distanceFromMe} ORDER BY distance`;
-        const nearMeStoresIds: any[] = await this.storeRepository.dataSource.execute(nearMeQuery);
-        const misteryBoxStoreFilter: any[] = [];
-        if (nearMeStoresIds.length > 0) {
-            nearMeStoresIds.forEach((store) => {
-                misteryBoxStoreFilter.push({idStore: store.id});
-            });
-
-            res = await this.storeRepository.find({
-                where: {or: misteryBoxStoreFilter},
-                include: [{relation: 'misteryBoxes'}]
-            });
-        }
-        return res;
     }
 
     /*@get('/stores/count', {

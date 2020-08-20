@@ -1,6 +1,10 @@
 import {repository,} from '@loopback/repository';
 import {MisteryBoxRepository, StoreRepository, UserRepository,} from '../repositories';
-import {MisteryBox} from "../models/mistery-box.model";
+import {MisteryBox} from "../models";
+import {get, getModelSchemaRef, param} from '@loopback/rest';
+import {secured} from "../decorators/secured";
+import {SecuredType, UserRoles} from "../utils/enums";
+import moment = require("moment");
 
 interface CreateMisteryBoxBody {
     misteryBox: Omit<MisteryBox, 'id'>,
@@ -9,14 +13,121 @@ interface CreateMisteryBoxBody {
 
 
 export class MisteryBoxController {
+
     constructor(
         @repository(MisteryBoxRepository) public misteryBoxRepository: MisteryBoxRepository,
         @repository(StoreRepository) public storeRepository: StoreRepository,
         @repository(UserRepository) public userRepository: UserRepository,
     ) {
+
+    }
+
+    @get('/mistery-boxes/near-me', {
+        operationId: 'Mistery boxes near me',
+        responses: {
+            '200': {
+                description: 'Array of Mistery Box model instances',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'array',
+                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @secured(SecuredType.IS_AUTHENTICATED)
+    async findNearMe(
+        @param.query.number('lat') currentLat,
+        @param.query.number('lon') currentLon,
+        @param.query.number('distance') distance,
+    ): Promise<any[]> {
+        let res: any[] = [];
+        const nearMeQuery = `SELECT id, SQRT( POW(69.1 * (lat - ${currentLat}), 2) + POW(69.1 * (${currentLon} - lon) * COS(lat / 57.3), 2)) AS distance FROM Store HAVING distance < ${distance} ORDER BY distance`;
+        const nearMeStoresIds: any[] = await this.storeRepository.dataSource.execute(nearMeQuery);
+        const misteryBoxStoreFilter: any[] = [];
+        if (nearMeStoresIds.length > 0) {
+            nearMeStoresIds.forEach((store) => {
+                misteryBoxStoreFilter.push({storeId: store.id});
+            });
+
+            res = await this.misteryBoxRepository.find({
+                where: {
+                    and: [
+                        {or: misteryBoxStoreFilter},
+                        {available: {gt: 1}},
+                        {date: {gte: moment().startOf('day').toDate()}}
+                    ],
+                }
+            });
+
+            console.log(moment().startOf('day').toDate());
+
+            res = JSON.parse(JSON.stringify(res));
+            if (res && res.length > 0) {
+                res.forEach((box) => {
+                    box.distance = nearMeStoresIds.find(x => x.id === box.storeId).distance;
+                });
+            }
+        }
+        return res;
     }
 
 
+    @get('/mistery-boxes/latest', {
+        operationId: 'Latest Mistery boxes',
+        responses: {
+            '200': {
+                description: 'Array of MisteryBox model instances',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'array',
+                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
+    async findLatest(): Promise<MisteryBox[]> {
+
+        const res: MisteryBox[] = await this.misteryBoxRepository.find({include: [{relation: 'store'}]});
+        return res;
+    }
+
+
+    @get('/mistery-boxes/sold-out', {
+        operationId: 'Sold out Mistery boxes',
+        responses: {
+            '200': {
+                description: 'Array of MisteryBox model instances',
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'array',
+                            items: getModelSchemaRef(MisteryBox, {includeRelations: true}),
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
+    async findSoldOut(): Promise<MisteryBox[]> {
+        const res: MisteryBox[] = await this.misteryBoxRepository.find({
+            where: {
+                and: [
+                    {available: 0,},
+                    {date: {gte: moment().startOf('day').toDate()}}
+                ],
+            }
+        });
+        return res;
+    }
 
     /*@post('/mistery-boxes', {
       responses: {

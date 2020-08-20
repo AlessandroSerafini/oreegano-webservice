@@ -9,7 +9,8 @@ const config = {
   port: 8889,
   user: 'root',
   password: 'root',
-  database: 'oreegano'
+  database: 'oreegano',
+  supportBigNumbers: true
 };
 
 // Observe application's life cycle to disconnect the datasource when
