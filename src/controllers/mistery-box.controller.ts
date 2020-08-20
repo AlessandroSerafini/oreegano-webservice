@@ -52,6 +52,7 @@ export class MisteryBoxController {
             });
 
             res = await this.misteryBoxRepository.find({
+                include: [{relation: "store"}],
                 where: {
                     and: [
                         {or: misteryBoxStoreFilter},
@@ -125,6 +126,7 @@ export class MisteryBoxController {
     @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
     async findSoldOut(): Promise<MisteryBox[]> {
         const res: MisteryBox[] = await this.misteryBoxRepository.find({
+            include: [{relation: "store"}],
             where: {
                 and: [
                     {available: 0,},
