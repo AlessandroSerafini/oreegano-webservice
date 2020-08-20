@@ -94,6 +94,7 @@ export class MisteryBoxController {
     async findLatest(): Promise<MisteryBox[]> {
 
         const res: MisteryBox[] = await this.misteryBoxRepository.find({
+            include: [{relation: "store"}],
             where: {
                 and: [
                     {available: {gt: 1, lte: 4}},

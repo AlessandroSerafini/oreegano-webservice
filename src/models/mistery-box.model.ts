@@ -66,8 +66,8 @@ export class MisteryBox extends Entity {
   })
   available: number;
 
-  @belongsTo(() => Store, {name: 'store'})
-  storeId: number; // customized foreign key name
+  @belongsTo(() => Store)
+  storeId: number;
 
   constructor(data?: Partial<MisteryBox>) {
     super(data);
