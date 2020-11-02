@@ -1,7 +1,7 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {UserRoles} from "../utils/enums";
 import {Address} from './address.model';
-import {Store} from './store.model';
+import {Order} from './order.model';
 
 @model()
 export class User extends Entity {
@@ -57,8 +57,8 @@ export class User extends Entity {
   @hasMany(() => Address)
   addresses: Address[];
 
-  @hasMany(() => Store)
-  stores: Store[];
+  @hasMany(() => Order)
+  orders: Order[];
 
     constructor(data?: Partial<User>) {
         super(data);

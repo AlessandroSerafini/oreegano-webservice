@@ -9,9 +9,9 @@ import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {promisify} from "util";
 import {sign} from "jsonwebtoken";
 import {Credentials, JwtResponse} from "../utils/interfaces";
-import {Address, Store} from '../models';
+import {Address, Order} from '../models';
 import {AddressRepository} from './address.repository';
-import {StoreRepository} from './store.repository';
+import {OrderRepository} from './order.repository';
 
 const signAsync = promisify(sign);
 
@@ -19,19 +19,21 @@ export class UserRepository extends DefaultCrudRepository<User,
     typeof User.prototype.id,
     UserRelations> {
 
-  public readonly addresses: HasManyRepositoryFactory<Address, typeof User.prototype.id>;
+    public readonly addresses: HasManyRepositoryFactory<Address, typeof User.prototype.id>;
 
-  public readonly stores: HasManyRepositoryFactory<Store, typeof User.prototype.id>;
+
+    public readonly orders: HasManyRepositoryFactory<Order, typeof User.prototype.id>;
+
 
     constructor(
         @inject('datasources.OreeganoWs') dataSource: OreeganoWsDataSource,
-        @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher, @repository.getter('AddressRepository') protected addressRepositoryGetter: Getter<AddressRepository>, @repository.getter('StoreRepository') protected storeRepositoryGetter: Getter<StoreRepository>,
+        @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher, @repository.getter('AddressRepository') protected addressRepositoryGetter: Getter<AddressRepository>, @repository.getter('OrderRepository') protected orderRepositoryGetter: Getter<OrderRepository>,
     ) {
         super(User, dataSource);
-      this.stores = this.createHasManyRepositoryFactoryFor('stores', storeRepositoryGetter,);
-      this.registerInclusionResolver('stores', this.stores.inclusionResolver);
-      this.addresses = this.createHasManyRepositoryFactoryFor('addresses', addressRepositoryGetter,);
-      this.registerInclusionResolver('addresses', this.addresses.inclusionResolver);
+        this.orders = this.createHasManyRepositoryFactoryFor('orders', orderRepositoryGetter,);
+        this.registerInclusionResolver('orders', this.orders.inclusionResolver);
+        this.addresses = this.createHasManyRepositoryFactoryFor('addresses', addressRepositoryGetter,);
+        this.registerInclusionResolver('addresses', this.addresses.inclusionResolver);
     }
 
     public handleApiKeyAuth(apiKey: string): void {
@@ -57,7 +59,7 @@ export class UserRepository extends DefaultCrudRepository<User,
 
     public async getJwtToken(user: User): Promise<JwtResponse> {
         const token = await this.generateToken(user);
-        const res:User = JSON.parse(JSON.stringify(user));
+        const res: User = JSON.parse(JSON.stringify(user));
         delete res.password;
         return {
             id: token,

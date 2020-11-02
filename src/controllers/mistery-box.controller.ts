@@ -5,6 +5,8 @@ import {get, getModelSchemaRef, param} from '@loopback/rest';
 import {secured} from "../decorators/secured";
 import {SecuredType, UserRoles} from "../utils/enums";
 import moment = require("moment");
+import {getNearQuery} from "../utils/query";
+import {getMisteryBoxesWithDistance} from "../utils/mapping";
 
 interface CreateMisteryBoxBody {
     misteryBox: Omit<MisteryBox, 'id'>,
@@ -36,42 +38,13 @@ export class MisteryBoxController {
             },
         },
     })
-    @secured(SecuredType.IS_AUTHENTICATED)
+    @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
     async findNearMe(
         @param.query.number('lat') currentLat,
         @param.query.number('lon') currentLon,
         @param.query.number('distance') distance,
     ): Promise<any[]> {
-        let res: any[] = [];
-        const nearMeQuery = `SELECT id, SQRT( POW(69.1 * (lat - ${currentLat}), 2) + POW(69.1 * (${currentLon} - lon) * COS(lat / 57.3), 2)) AS distance FROM Store HAVING distance < ${distance} ORDER BY distance`;
-        const nearMeStoresIds: any[] = await this.storeRepository.dataSource.execute(nearMeQuery);
-        const misteryBoxStoreFilter: any[] = [];
-        if (nearMeStoresIds.length > 0) {
-            nearMeStoresIds.forEach((store) => {
-                misteryBoxStoreFilter.push({storeId: store.id});
-            });
-
-            res = await this.misteryBoxRepository.find({
-                include: [{relation: "store"}],
-                where: {
-                    and: [
-                        {or: misteryBoxStoreFilter},
-                        {available: {gt: 1}},
-                        {date: {gte: moment().startOf('day').toDate()}}
-                    ],
-                }
-            });
-
-            console.log(moment().startOf('day').toDate());
-
-            res = JSON.parse(JSON.stringify(res));
-            if (res && res.length > 0) {
-                res.forEach((box) => {
-                    box.distance = nearMeStoresIds.find(x => x.id === box.storeId).distance;
-                });
-            }
-        }
-        return res;
+        return getMisteryBoxesWithDistance(currentLat, currentLon, distance, this.storeRepository, this.misteryBoxRepository, {available: {gte: 1}}, true);
     }
 
 
@@ -92,18 +65,12 @@ export class MisteryBoxController {
         },
     })
     @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
-    async findLatest(): Promise<MisteryBox[]> {
-
-        const res: MisteryBox[] = await this.misteryBoxRepository.find({
-            include: [{relation: "store"}],
-            where: {
-                and: [
-                    {available: {gt: 1, lte: 4}},
-                    {date: {gte: moment().startOf('day').toDate()}}
-                ],
-            }
-        });
-        return res;
+    async findLatest(
+        @param.query.number('lat') currentLat,
+        @param.query.number('lon') currentLon,
+        @param.query.number('distance') distance
+    ): Promise<MisteryBox[]> {
+        return getMisteryBoxesWithDistance(currentLat, currentLon, distance, this.storeRepository, this.misteryBoxRepository, {and: [{available: {gte: 1}}, {available: {lte: 4}}]});
     }
 
 
@@ -124,17 +91,12 @@ export class MisteryBoxController {
         },
     })
     @secured(SecuredType.HAS_ROLE, UserRoles.CUSTOMER)
-    async findSoldOut(): Promise<MisteryBox[]> {
-        const res: MisteryBox[] = await this.misteryBoxRepository.find({
-            include: [{relation: "store"}],
-            where: {
-                and: [
-                    {available: 0,},
-                    {date: {gte: moment().startOf('day').toDate()}}
-                ],
-            }
-        });
-        return res;
+    async findSoldOut(
+        @param.query.number('lat') currentLat,
+        @param.query.number('lon') currentLon,
+        @param.query.number('distance') distance
+    ): Promise<MisteryBox[]> {
+        return getMisteryBoxesWithDistance(currentLat, currentLon, distance, this.storeRepository, this.misteryBoxRepository, {available: 0,});
     }
 
     /*@post('/mistery-boxes', {

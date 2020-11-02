@@ -69,11 +69,6 @@ export class Store extends Entity {
     @hasMany(() => MisteryBox, {keyTo: 'storeId'})
     misteryBoxes: MisteryBox[];
 
-    @property({
-        type: 'number',
-    })
-    userId?: number;
-
     constructor(data?: Partial<Store>) {
         super(data);
     }

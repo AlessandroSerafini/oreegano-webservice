@@ -2,6 +2,7 @@ import {BindingKey,} from '@loopback/core';
 import {AuthenticationStrategy,} from '@loopback/authentication';
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
 import {EmailService} from "../services/email.service";
+import {SocketService} from "../services/socket.service";
 
 // implement custom namespace bindings
 export namespace MyAuthBindings {
@@ -18,5 +19,11 @@ export namespace PasswordHasherBindings {
 export namespace EmailServiceBindings {
   export const EMAIL_SERVICE = BindingKey.create<EmailService>(
     'services.EmailService',
+  );
+}
+
+export namespace SocketServiceBindings {
+  export const SOCKET_SERVICE = BindingKey.create<SocketService>(
+    'services.SocketService',
   );
 }

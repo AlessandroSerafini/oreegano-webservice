@@ -4,18 +4,19 @@ import {User} from "../models/user.model";
 import {inject} from "@loopback/context";
 import {PasswordHasherBindings} from "../utils/namespaces";
 import {PasswordHasher} from "../services/hash.password.bcryptjs";
-import {UserRepository} from "../repositories";
+import {AddressRepository, UserRepository} from "../repositories";
 import {Credentials, JwtResponse} from "../utils/interfaces";
 import {EmailService} from "../services/email.service";
 import moment = require("moment");
+import {Address} from "../models";
 
 const PSW_REC_INTERVAL_HOURS = 24;
 const PSW_REC_TOKEN_INTERVAL_HOURS = 168;
 
 export class UserController {
     constructor(
-        @repository(UserRepository)
-        public userRepository: UserRepository,
+        @repository(UserRepository) public userRepository: UserRepository,
+        @repository(AddressRepository) public addressRepository: AddressRepository,
         @inject('services.EmailService') private emailService: EmailService,
         @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher
     ) {
@@ -31,18 +32,18 @@ export class UserController {
         },
     })
     async create(
-      @param.header.string('apiKey') apiKey = '',
-      @requestBody({
-          content: {
-              'application/json': {
-                  schema: getModelSchemaRef(User, {
-                      title: 'NewUser',
-                      exclude: ['id', 'pswRecToken', 'pswRecTokenExpireDate', 'pswRecExpireDate'],
-                  }),
-              },
-          },
-      })
-        user: Omit<User, 'id'>,
+        @param.header.string('apiKey') apiKey = '',
+        @requestBody({
+            content: {
+                'application/json': {
+                    schema: getModelSchemaRef(User, {
+                        title: 'NewUser',
+                        exclude: ['id', 'pswRecToken', 'pswRecTokenExpireDate', 'pswRecExpireDate'],
+                    }),
+                },
+            },
+        })
+            user: Omit<User, 'id'>,
     ): Promise<JwtResponse> {
         this.userRepository.handleApiKeyAuth(apiKey);
         if (!this.userRepository.validateEmail(user.email))
@@ -89,7 +90,9 @@ export class UserController {
 
         const user: User | null = await this.userRepository.findOne({where: {email: credentials.email}});
 
-        return this.userRepository.handleLogin(user, credentials);
+        const address: Address | null = await this.addressRepository.findOne({where: {userId: user?.id}});
+
+        return {...await this.userRepository.handleLogin(user, credentials), ...{address}};
     }
 
     @post('/users/password-recovery', {
@@ -164,22 +167,22 @@ export class UserController {
         },
     })
     async resetPasswordByToken(
-      @param.header.string('apiKey') apiKey = '',
-      @param.path.string('token') token: string,
-      @requestBody({
-          required: true,
-          content: {
-              'application/json': {
-                  schema: {
-                      type: 'object',
-                      properties: {
-                          password: {type: 'string'}
-                      },
-                  },
-              },
-          },
-      })
-        data: any,
+        @param.header.string('apiKey') apiKey = '',
+        @param.path.string('token') token: string,
+        @requestBody({
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                            password: {type: 'string'}
+                        },
+                    },
+                },
+            },
+        })
+            data: any,
     ): Promise<JwtResponse> {
         this.userRepository.handleApiKeyAuth(apiKey);
         const user: User | null = await this.userRepository.findOne({where: {pswRecToken: token}});

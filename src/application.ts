@@ -6,7 +6,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
 import {MySequence} from './sequence';
-import {EmailServiceBindings, MyAuthBindings, PasswordHasherBindings} from "./utils/namespaces";
+import {EmailServiceBindings, MyAuthBindings, PasswordHasherBindings, SocketServiceBindings} from "./utils/namespaces";
 import {MyAuthAuthenticationStrategyProvider} from "./providers/MyAuthAuthenticationStrategyProvider";
 import {MyAuthMetadataProvider} from "./providers/MyAuthMetadataProvider";
 import {MyAuthActionProvider} from "./providers/MyAuthActionProvider";
@@ -29,12 +29,10 @@ export class OreeganoWsApplication extends BootMixin(
 ) {
     constructor(options: ApplicationConfig = {}) {
         super(options);
+
         const socketService = new SocketService();
 
         socketService.initSocket();
-        setTimeout(()=>{
-            socketService.updateLocation(1, "10", "20");
-        }, 5000);
 
         // Set up the custom sequence
         this.sequence(MySequence);
@@ -65,6 +63,7 @@ export class OreeganoWsApplication extends BootMixin(
         this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
 
         this.bind(EmailServiceBindings.EMAIL_SERVICE).toClass(EmailService);
+        this.bind(SocketServiceBindings.SOCKET_SERVICE).toClass(SocketService);
 
         this.projectRoot = __dirname;
         // Customize @loopback/boot Booter Conventions here
