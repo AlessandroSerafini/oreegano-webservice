@@ -176,10 +176,11 @@ export class OrderController {
             position: {
                 latitude: { type: 'number' },
                 longitude: { type: 'number' }
-            }
+            },
+            idRunner: number,
         },
     ): Promise<void> {
-        return this.socketService.updateLocation(id, data.position);
+        return this.socketService.updateLocation(id, data.position, data.idRunner);
     }
 
     @get('/orders/{id}', {
