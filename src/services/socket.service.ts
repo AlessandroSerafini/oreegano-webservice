@@ -18,9 +18,9 @@ export class SocketService {
         latitude: { type: 'number' },
         longitude: { type: 'number' }
     }, idRunner: number) {
-        //io.sockets.emit(`trackOrder-${idOrder}`, {position, idRunner});
+        io.sockets.emit(`trackOrder-${idOrder}`, {position, idRunner});
 
-        for (let i = 0; i < 9; i++) {
+        /*for (let i = 0; i < 9; i++) {
             setTimeout(() => {
                 io.sockets.emit(`trackOrder-${idOrder}`, {
                     position: {
@@ -29,6 +29,6 @@ export class SocketService {
                     }, idRunner
                 });
             }, i*500);
-        }
+        }*/
     }
 }

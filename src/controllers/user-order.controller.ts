@@ -81,7 +81,6 @@ export class UserOrderController {
         }) data: { order: Omit<Order, 'id'>, idBox: number }
     ): Promise<Order> {
         const box: MisteryBox = await this.misteryBoxRepository.findById(data.idBox);
-
         await this.misteryBoxRepository.updateById(data.idBox, {available: box.available - 1});
         return this.userRepository.orders(id).create(data.order);
     }
